@@ -74,15 +74,18 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
             batch_size = coors[-1, 0] + 1
             voxel_feats_seq.append(voxel_features)
             coors_seq.append(coors)
-        breakpoint()
-        if 'Fusion' in self.pts_middle_encoder.__class__.__name__:
-            x = self.pts_middle_encoder(voxel_features, coors, batch_size, img_feats=img_feats, img_metas=img_metas, img=img)
-        else:
-            x = self.pts_middle_encoder(voxel_features, coors, batch_size)
-        x = self.pts_backbone(x)
-        if self.with_pts_neck:
-            x = self.pts_neck(x)
-        return x
+
+        bev_feats_seq = []
+        for i in range(len(voxel_feats_seq)):
+            if 'Fusion' in self.pts_middle_encoder.__class__.__name__:
+                x = self.pts_middle_encoder(voxel_feats_seq[i], coors_seq[i], batch_size, img_feats=img_feats[i], img_metas=img_metas[i], img=img[i])
+            else:
+                x = self.pts_middle_encoder(voxel_feats_seq[i], coors_seq[i], batch_size)
+            x = self.pts_backbone(x)
+            if self.with_pts_neck:
+                x = self.pts_neck(x)
+            bev_feats_seq.append(x)
+        return bev_feats_seq
 
     def extract_feat(self, points, img, img_metas):
         """Extract features from images and points."""
@@ -163,9 +166,12 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
         losses = dict()
+
         if pts_feats:
-            losses_pts = self.forward_pts_train(pts_feats, img_feats, gt_bboxes_3d,
-                                                gt_labels_3d, img_metas,
+            losses_pts = self.forward_pts_train(pts_feats, img_feats, 
+                                                gt_bboxes_3d,
+                                                gt_labels_3d, 
+                                                img_metas,
                                                 gt_bboxes_ignore)
             losses.update(losses_pts)
         if img_feats:
