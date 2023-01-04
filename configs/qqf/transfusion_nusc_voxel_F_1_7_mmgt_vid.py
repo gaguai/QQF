@@ -95,17 +95,17 @@ train_pipeline = [
 ]
 test_pipeline = [
     dict(
-        type='LoadPointsFromFile',
+        type='LoadPointsFromFileVID',
         coord_type='LIDAR',
         load_dim=5,
         use_dim=[0, 1, 2, 3, 4],
     ),
     dict(
-        type='LoadPointsFromMultiSweeps',
+        type='LoadPointsFromMultiSweepsVID',
         sweeps_num=10,
         use_dim=[0, 1, 2, 3, 4],
     ),
-    dict(type='LoadMultiViewImageFromFiles'),
+    dict(type='LoadMultiViewImageFromFilesVID'),
     dict(
         type='MultiScaleFlipAug3D',
         img_scale=img_scale,
@@ -113,23 +113,23 @@ test_pipeline = [
         flip=False,
         transforms=[
             dict(
-                type='GlobalRotScaleTrans',
+                type='GlobalRotScaleTransVID',
                 rot_range=[0, 0],
                 scale_ratio_range=[1.0, 1.0],
                 translation_std=[0, 0, 0]),
-            dict(type='RandomFlip3D'),
-            dict(type='MyResize', img_scale=img_scale, keep_ratio=True),
-            dict(type='MyNormalize', **img_norm_cfg),
-            dict(type='MyPad', size_divisor=32),
+            dict(type='RandomFlip3DVID'),
+            dict(type='MyResizeVID', img_scale=img_scale, keep_ratio=True),
+            dict(type='MyNormalizeVID', **img_norm_cfg),
+            dict(type='MyPadVID', size_divisor=32),
             dict(
-                type='DefaultFormatBundle3D',
+                type='DefaultFormatBundle3DVID',
                 class_names=class_names,
                 with_label=False),
-            dict(type='Collect3D', keys=['points', 'img'])
+            dict(type='Collect3DVID', keys=['points', 'img'])
         ])
 ]
 data = dict(
-    samples_per_gpu=3,
+    samples_per_gpu=2,
     workers_per_gpu=6,
     train=dict(
         type='CBGSDataset',
@@ -256,13 +256,13 @@ model = dict(
         upsample_cfg=dict(type='deconv', bias=False),
         use_conv_for_no_stride=True),
     pts_bbox_head=dict(
-        type='TransFusionHead',
+        type='TempTransFusionHead',
         num_proposals=200,
         auxiliary=True,
         in_channels=256 * 2,
         hidden_channel=128,
         num_classes=len(class_names),
-        num_decoder_layers=1,
+        num_decoder_layers=2,
         num_heads=8,
         learnable_query_pos=False,
         initialize_by_heatmap=True,

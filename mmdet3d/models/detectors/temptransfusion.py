@@ -166,7 +166,6 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
         losses = dict()
-
         if pts_feats:
             losses_pts = self.forward_pts_train(pts_feats, img_feats, 
                                                 gt_bboxes_3d,
@@ -209,7 +208,7 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
             dict: Losses of each branch.
         """
         outs = self.pts_bbox_head(pts_feats, img_feats, img_metas)
-        loss_inputs = [gt_bboxes_3d, gt_labels_3d, outs]
+        loss_inputs = [gt_bboxes_3d[0], gt_labels_3d[0], outs]
         losses = self.pts_bbox_head.loss(*loss_inputs)
         return losses
 
@@ -217,7 +216,7 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
         """Test function of point cloud branch."""
         outs = self.pts_bbox_head(x, x_img, img_metas)
         bbox_list = self.pts_bbox_head.get_bboxes(
-            outs, img_metas, rescale=rescale)
+            outs, img_metas[0], rescale=rescale)
         bbox_results = [
             bbox3d2result(bboxes, scores, labels)
             for bboxes, scores, labels in bbox_list
@@ -229,7 +228,7 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
 
-        bbox_list = [dict() for i in range(len(img_metas))]
+        bbox_list = [dict() for i in range(len(img_metas[0]))]
         if pts_feats and self.with_pts_bbox:
             bbox_pts = self.simple_test_pts(
                 pts_feats, img_feats, img_metas, rescale=rescale)
