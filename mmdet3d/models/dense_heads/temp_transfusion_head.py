@@ -193,13 +193,13 @@ class TempTransformerDecoderLayer(nn.Module):
         else:
             k_query_pos_embed = None
         if self.cross_posembed is not None:
-            feat_pos_embed = self.cross_posembed(feat_pos_list[seq]).permute(2, 0, 1)
+            feat_pos_embed = self.cross_posembed(feat_pos_list[q_idx]).permute(2, 0, 1)
         else:
             feat_pos_embed = None
 
         q_query = obj_query_list[q_idx].permute(2, 0, 1)
         k_query = obj_query_list[k_idx].permute(2, 0, 1)
-        feat = feat_list[seq].permute(2, 0, 1)
+        feat = feat_list[q_idx].permute(2, 0, 1)
 
         if not self.cross_only:
             # q = k = v = self.with_pos_embed(query, query_pos_embed)

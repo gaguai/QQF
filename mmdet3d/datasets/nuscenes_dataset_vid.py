@@ -338,8 +338,8 @@ class NuScenesDatasetVID(Custom3DDataset):
         for sample_id, det in enumerate(mmcv.track_iter_progress(results)):
             annos = []
             boxes = output_to_nusc_box(det)
-            sample_token = self.data_infos[sample_id]['token']
-            boxes = lidar_nusc_box_to_global(self.data_infos[sample_id], boxes,
+            sample_token = self.data_infos[sample_id][0]['token']
+            boxes = lidar_nusc_box_to_global(self.data_infos[sample_id][0], boxes,
                                              mapped_class_names,
                                              self.eval_detection_configs,
                                              self.eval_version)
@@ -357,14 +357,14 @@ class NuScenesDatasetVID(Custom3DDataset):
                     elif name in ['bicycle', 'motorcycle']:
                         attr = 'cycle.with_rider'
                     else:
-                        attr = NuScenesDataset.DefaultAttribute[name]
+                        attr = NuScenesDatasetVID.DefaultAttribute[name]
                 else:
                     if name in ['pedestrian']:
                         attr = 'pedestrian.standing'
                     elif name in ['bus']:
                         attr = 'vehicle.stopped'
                     else:
-                        attr = NuScenesDataset.DefaultAttribute[name]
+                        attr = NuScenesDatasetVID.DefaultAttribute[name]
 
                 nusc_anno = dict(
                     sample_token=sample_token,

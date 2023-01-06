@@ -607,7 +607,6 @@ class DataBaseTemporalSampler(object):
         sampled = [[] for _ in range(seq_len)]
         sampled_gt_bboxes = [[] for _ in range(seq_len)]
         avoid_coll_boxes = gt_bboxes
-
         for class_name, sampled_num in zip(self.sample_classes,
                                            sample_num_per_class):
             if sampled_num > 0:
