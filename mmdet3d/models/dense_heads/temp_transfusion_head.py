@@ -128,6 +128,7 @@ class TempTransformerDecoderLayer(nn.Module):
         self.cross_only = cross_only
         # if not self.cross_only:
         #     self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
+
         self.multihead_query_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
         self.multihead_attn = MultiheadAttention(d_model, nhead, dropout=dropout)
         # Implementation of Feedforward model
@@ -1132,13 +1133,11 @@ class TempTransFusionHead(nn.Module):
             ret_dicts.append(res_layer)
 
         if self.initialize_by_heatmap:
-            for seq in range(1, self.num_seq):
-                ret_dicts[seq]['query_heatmap_score'] = heatmap_seq[seq].gather(index=top_proposals_index[:, None, :].expand(-1, self.num_classes, -1), dim=-1)  # [bs, num_classes, num_proposals]
-                if self.fuse_img:
-                    ret_dicts[0]['dense_heatmap'] = dense_heatmap_img
-                else:
-                    ret_dicts[seq]['dense_heatmap'] = dense_heatmap_seq[seq]
-
+            ret_dicts[1]['query_heatmap_score'] = heatmap_seq[0].gather(index=top_proposals_index[:, None, :].expand(-1, self.num_classes, -1), dim=-1)  # [bs, num_classes, num_proposals]
+            if self.fuse_img:
+                ret_dicts[0]['dense_heatmap'] = dense_heatmap_img
+            else:
+                ret_dicts[1]['dense_heatmap'] = dense_heatmap_seq[0]
         if self.auxiliary is False:
             # only return the results of last decoder layer
             return [ret_dicts[-1]]

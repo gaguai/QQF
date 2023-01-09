@@ -517,7 +517,6 @@ class Collect3DVID(object):
             data['img_metas'].append(DC(img_metas[i], cpu_only=True))
         for key in self.keys:
             data[key] = results[key]
-
         return data
 
     def __repr__(self):

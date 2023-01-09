@@ -448,7 +448,6 @@ class ACTR(nn.Module):
             coor_2d_b_o[b, :pts[b].shape[0]] = coor_2d_o
             pts_feats_b[b, :pts[b].shape[0]] = pts_feats[st:st+num_points[b]]
             st += num_points[b]
-
         pts_feats_n, img_feats_n, coor_2d_n, coor_2d_n_o, pts_n, num_points_n, pts_mask_n = self.split_param(
             pts_feats_b, coor_2d_b, coor_2d_b_o, img_feats, pts_b, num_points, img_meta)
         if False:

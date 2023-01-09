@@ -158,10 +158,10 @@ class TemporalTransFusionDetector(MVXTwoStageDetector):
         # if True:
         #     from mmdet3d.utils.simplevis import nuscene_vis
         #     import cv2
-        #     bev = nuscene_vis(points[0].cpu().numpy(),
-        #             gt_bboxes_3d[0].tensor.numpy()
-        #             )
-        #     cv2.imwrite('demo_bev_nogt.png', bev)
+        #     bev_cur = nuscene_vis(points[0][0].cpu().numpy(), gt_bboxes_3d[0][0].tensor.numpy())
+        #     bev_prev = nuscene_vis(points[1][0].cpu().numpy(), gt_bboxes_3d[1][0].tensor.numpy())
+        #     cv2.imwrite('deb_cur.png', bev_cur)
+        #     cv2.imwrite('deb_prev.png', bev_cur)
         #     import pdb; pdb.set_trace()
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
