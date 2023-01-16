@@ -783,6 +783,8 @@ class DataBaseTemporalSampler(object):
                     coll_mat[i] = False
                     coll_mat[:, i] = False
                 else:
+                    # # avoid temporal collapse
+                    # valid_samples_list[gt_idx].append(sampled_list[gt_idx][i - num_gt])
                     valid_samples.append(i - num_gt)
             valid_samples_mask[gt_idx, valid_samples] = 1
 
@@ -798,6 +800,16 @@ class DataBaseTemporalSampler(object):
                     valid_samples_list[t].append(sampled_list[t][i])
             else:
                 continue
+            # # avoid temporal collapse
+            # if len(valid_samples_list[0]) < len(valid_samples_list[1]):
+            #     valid_samples_list[1] = valid_samples_list[1][:len(valid_samples_list[0])]
+            # if len(valid_samples_list[0]) > len(valid_samples_list[1]):
+            #     diff = len(valid_samples_list[0]) - len(valid_samples_list[1])
+            #     for _ in range(diff):
+            #         if len(valid_samples_list[1])==0:
+            #             valid_samples_list[1].append(valid_samples_list[0][0])
+            #             continue
+            #         valid_samples_list[1].append(valid_samples_list[1][-1])
 
         return valid_samples_list
 

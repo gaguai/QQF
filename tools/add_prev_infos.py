@@ -19,9 +19,9 @@ for i in tqdm(range(len(infos['infos']))):
     prev_info, cur_info = infos['infos'][i-1], infos['infos'][i]
     
     if prev_info['scene_token']==cur_info['scene_token']:
-        prev_infos['infos'].append([cur_info,prev_info])
+        prev_infos['infos'].append([cur_info, prev_info])
     else:
-        prev_infos['infos'].append([cur_info,cur_info])
+        prev_infos['infos'].append([cur_info, cur_info])
    
 prev_infos['metadata'] = infos['metadata']
 

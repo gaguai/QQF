@@ -1310,7 +1310,7 @@ class LoadAnnotations3DVID(LoadAnnotations):
         """
         results['gt_bboxes_3d']=[]
         for i in range(len(results['ann_info'])):
-            results['gt_bboxes_3d'].append(results['ann_info'][i]       ['gt_bboxes_3d'])
+            results['gt_bboxes_3d'].append(results['ann_info'][i]['gt_bboxes_3d'])
 
         results['bbox3d_fields'].append('gt_bboxes_3d')
 
