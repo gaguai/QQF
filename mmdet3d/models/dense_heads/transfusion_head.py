@@ -1105,15 +1105,14 @@ class TransFusionHead(nn.Module):
                 - int: number of positive proposals
         """
         num_proposals = preds_dict['center'].shape[-1]
-
         # get pred boxes, carefully ! donot change the network outputs
-        score = copy.deepcopy(preds_dict['heatmap'].detach())
-        center = copy.deepcopy(preds_dict['center'].detach())
-        height = copy.deepcopy(preds_dict['height'].detach())
-        dim = copy.deepcopy(preds_dict['dim'].detach())
-        rot = copy.deepcopy(preds_dict['rot'].detach())
+        score = copy.deepcopy(preds_dict['heatmap'].float().detach())
+        center = copy.deepcopy(preds_dict['center'].float().detach())
+        height = copy.deepcopy(preds_dict['height'].float().detach())
+        dim = copy.deepcopy(preds_dict['dim'].float().detach())
+        rot = copy.deepcopy(preds_dict['rot'].float().detach())
         if 'vel' in preds_dict.keys():
-            vel = copy.deepcopy(preds_dict['vel'].detach())
+            vel = copy.deepcopy(preds_dict['vel'].float().detach())
         else:
             vel = None
 
@@ -1227,6 +1226,10 @@ class TransFusionHead(nn.Module):
         Returns:
             dict[str:torch.Tensor]: Loss of heatmap and bbox of each task.
         """
+        ###########################
+        for key in preds_dicts[0][0]:
+            preds_dicts[0][0][key] = preds_dicts[0][0][key].float() 
+        ###########################
         if self.initialize_by_heatmap:
             labels, label_weights, bbox_targets, bbox_weights, ious, num_pos, matched_ious, heatmap = self.get_targets(gt_bboxes_3d, gt_labels_3d, preds_dicts[0])
         else:
@@ -1282,6 +1285,7 @@ class TransFusionHead(nn.Module):
 
         return loss_dict
 
+    @force_fp32(apply_to=('preds_dicts'))
     def get_bboxes(self, preds_dicts, img_metas, img=None, rescale=False, for_roi=False):
         """Generate bboxes from bbox head predictions.
 
@@ -1291,6 +1295,11 @@ class TransFusionHead(nn.Module):
         Returns:
             list[list[dict]]: Decoded bbox, scores and labels for each layer & each batch
         """
+        ###########################
+        for key in preds_dicts[0][0]:
+            preds_dicts[0][0][key] = preds_dicts[0][0][key].float() 
+        ###########################
+
         rets = []
         for layer_id, preds_dict in enumerate(preds_dicts):
             batch_size = preds_dict[0]['heatmap'].shape[0]

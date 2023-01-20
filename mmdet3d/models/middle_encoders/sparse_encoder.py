@@ -3,7 +3,16 @@ import torch
 from torch import nn as nn
 
 from mmdet3d.ops import SparseBasicBlock, make_sparse_convmodule
-from mmdet3d.ops import spconv as spconv
+from mmdet3d.ops.spconv import IS_SPCONV2_AVAILABLE
+
+if IS_SPCONV2_AVAILABLE:
+    import spconv.pytorch as spconv
+    from spconv.pytorch import SparseConvTensor, SparseSequential
+else:
+    from mmcv.ops import SparseConvTensor, SparseSequential
+    from mmdet3d.ops import spconv as spconv
+
+# from mmdet3d.ops import spconv as spconv
 from ..registry import MIDDLE_ENCODERS
 from .. import builder
 

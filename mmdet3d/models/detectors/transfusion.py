@@ -150,12 +150,6 @@ class TransFusionDetector(MVXTwoStageDetector):
         #             )
         #     cv2.imwrite('demo_bev_nogt.png', bev)
         #     import pdb; pdb.set_trace()
-        img = img[0]
-        points = points[0]
-        img_metas = img_metas[0]
-        gt_bboxes_3d = gt_bboxes_3d[0]
-        gt_labels_3d = gt_labels_3d[0]
-
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
         losses = dict()
@@ -216,10 +210,6 @@ class TransFusionDetector(MVXTwoStageDetector):
 
     def simple_test(self, points, img_metas, img=None, rescale=False):
         """Test function without augmentaiton."""
-        img = img[0]
-        points = points[0]
-        img_metas = img_metas[0]
-
         img_feats, pts_feats = self.extract_feat(
             points, img=img, img_metas=img_metas)
 
