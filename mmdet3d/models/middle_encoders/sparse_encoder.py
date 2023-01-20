@@ -16,6 +16,13 @@ else:
 from ..registry import MIDDLE_ENCODERS
 from .. import builder
 
+def replace_feature(out, new_features):
+    if 'replace_feature' in out.__dir__():
+        # spconv 2.x behaviour
+        return out.replace_feature(new_features)
+    else:
+        out.features = new_features
+        return out
 
 @MIDDLE_ENCODERS.register_module()
 class SparseEncoder(nn.Module):
@@ -364,7 +371,7 @@ class SparseEncoderFusion(nn.Module):
                 c_pts = self.coor2pts(x, 0.5)
                 f_feats = self.fusion_layer(img_feats, c_pts, x.features,
                                             img_metas, img)
-                x.features = f_feats
+                x = replace_feature(x, f_feats)
             encode_features.append(x)
 
         # for detection head
