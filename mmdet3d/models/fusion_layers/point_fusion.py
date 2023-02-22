@@ -450,6 +450,7 @@ class ACTR(nn.Module):
             st += num_points[b]
         pts_feats_n, img_feats_n, coor_2d_n, coor_2d_n_o, pts_n, num_points_n, pts_mask_n = self.split_param(
             pts_feats_b, coor_2d_b, coor_2d_b_o, img_feats, pts_b, num_points, img_meta)
+        breakpoint()
         if False:
             import cv2
             for b in range(batch_size):
@@ -625,9 +626,9 @@ def projection(points, nusc, img_meta, idx, img_features=None, data_root=None):
     point_idx = (mask != 0).nonzero()[0]
 
     # visualize
-    if False: #len(pts_2d):
+    if True: #len(pts_2d):
         import cv2
-        image = cv2.imread(data_root + '/' + img_meta['filename'][idx], cv2.COLOR_BGR2RGB)
+        image = cv2.imread(img_meta['filename'][idx], cv2.COLOR_BGR2RGB)
         global IDX
         for i in pts_2d:
             x = i[0].item()
@@ -638,5 +639,5 @@ def projection(points, nusc, img_meta, idx, img_features=None, data_root=None):
                 color=(0, 0, 255),
                 thickness=-1)
         cv2.imwrite("test.png", image)
-
+        breakpoint()
     return pts_2d, point_idx

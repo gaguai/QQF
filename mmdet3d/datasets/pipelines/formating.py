@@ -487,7 +487,7 @@ class Collect3DVID(object):
                             'box_mode_3d', 'box_type_3d', 'img_norm_cfg',
                             'rect', 'Trv2c', 'P2', 'pcd_trans', 'sample_idx',
                             'pcd_scale_factor', 'pcd_rotation', 'pts_filename',
-                            'transformation_3d_flow')):
+                            'transformation_3d_flow','ego_rot','ego_trans',)):
         self.keys = keys
         self.meta_keys = meta_keys
 
