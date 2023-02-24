@@ -6,7 +6,7 @@ class_names = [
 voxel_size = [0.075, 0.075, 0.2]
 out_size_factor = 8
 evaluation = dict(interval=1)
-dataset_type = 'NuScenesDatasetVID'
+dataset_type = 'NuScenesDataset'
 data_root = 'data/nuscenes/'
 input_modality = dict(
     use_lidar=True,
@@ -14,132 +14,120 @@ input_modality = dict(
     use_radar=False,
     use_map=False,
     use_external=False)
-img_scale = (800, 448)
 num_views = 6
 with_info = True
-img_norm_cfg = dict(mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
-seq_len = 2
 train_pipeline = [
     dict(
-        type='LoadPointsFromFileVID',
+        type='LoadPointsFromFile',
         coord_type='LIDAR',
         load_dim=5,
         use_dim=[0, 1, 2, 3, 4],
     ),
     dict(
-        type='LoadPointsFromMultiSweepsVID',
+        type='LoadPointsFromMultiSweeps',
         sweeps_num=10,
         use_dim=[0, 1, 2, 3, 4],
     ),
-    dict(type='LoadAnnotations3DVID', with_bbox_3d=True, with_label_3d=True),
-    dict(type='LoadMultiViewImageFromFilesVID'),
-    # dict(
-    #     type='ObjectSampleVID',
-    #     with_info=with_info,
-    #     sample_2d=True,
-    #     db_sampler=dict(
-    #         data_root=data_root,
-    #         #  info_path=data_root + 'nuscenes_dbinfos_train_focal.pkl',
-    #         info_path_list=[data_root + 'nuscenes_dbinfos_train.pkl',
-    #                         data_root + 'nuscenes_t-1_dbinfos_train.pkl'],
-    #         rate=1.0,
-    #         prepare=dict(
-    #             filter_by_difficulty=[-1],
-    #             filter_by_min_points=dict(
-    #                 car=5,
-    #                 truck=5,
-    #                 bus=5,
-    #                 trailer=5,
-    #                 construction_vehicle=5,
-    #                 traffic_cone=5,
-    #                 barrier=5,
-    #                 motorcycle=5,
-    #                 bicycle=5,
-    #                 pedestrian=5)),
-    #         classes=class_names,
-    #         sample_groups=dict(
-    #             car=2,
-    #             truck=3,
-    #             construction_vehicle=7,
-    #             bus=4,
-    #             trailer=6,
-    #             barrier=2,
-    #             motorcycle=6,
-    #             bicycle=6,
-    #             pedestrian=2,
-    #             traffic_cone=2),
-    #         points_loader=dict(
-    #             type='LoadPointsFromFile',
-    #             coord_type='LIDAR',
-    #             load_dim=5,
-    #             use_dim=[0, 1, 2, 3, 4],
-    #         ))),
+    dict(type='LoadMultiViewImageFromFiles'),
+    dict(type='LoadAnnotations3D', with_bbox_3d=True, with_label_3d=True),
     dict(
-        type='GlobalRotScaleTransVID',
+        type='ObjectSample',
+        with_info=with_info,
+        sample_2d=True,
+        db_sampler=dict(
+            data_root=data_root,
+            info_path=data_root + 'nuscenes_dbinfos_train.pkl',
+            rate=1.0,
+            prepare=dict(
+                filter_by_difficulty=[-1],
+                filter_by_min_points=dict(
+                    car=5,
+                    truck=5,
+                    bus=5,
+                    trailer=5,
+                    construction_vehicle=5,
+                    traffic_cone=5,
+                    barrier=5,
+                    motorcycle=5,
+                    bicycle=5,
+                    pedestrian=5)),
+            classes=class_names,
+            sample_groups=dict(
+                car=2,
+                truck=3,
+                construction_vehicle=7,
+                bus=4,
+                trailer=6,
+                barrier=2,
+                motorcycle=6,
+                bicycle=6,
+                pedestrian=2,
+                traffic_cone=2),
+            points_loader=dict(
+                type='LoadPointsFromFile',
+                coord_type='LIDAR',
+                load_dim=5,
+                use_dim=[0, 1, 2, 3, 4],
+            ))),
+    dict(
+        type='GlobalRotScaleTrans',
         rot_range=[-0.3925 * 2, 0.3925 * 2],
         scale_ratio_range=[0.9, 1.1],
         translation_std=[0.5, 0.5, 0.5]),
     dict(
-        type='RandomFlip3DVID',
+        type='RandomFlip3D',
         sync_2d=False,
         flip_ratio_bev_horizontal=0.5,
         flip_ratio_bev_vertical=0.5),
-    dict(type='PointsRangeFilterVID', point_cloud_range=point_cloud_range),
-    dict(type='ObjectRangeFilterVID', point_cloud_range=point_cloud_range),
-    dict(type='ObjectNameFilterVID', classes=class_names),
-    dict(type='PointShuffleVID'),
-    dict(type='MyResizeVID', img_scale=img_scale, keep_ratio=True),
-    dict(type='MyNormalizeVID', **img_norm_cfg),
-    dict(type='MyPadVID', size_divisor=32),
-    dict(type='DefaultFormatBundle3DVID', class_names=class_names),
-    dict(type='Collect3DVID', keys=['points', 'img', 'gt_bboxes_3d', 'gt_labels_3d'])
+    dict(type='PointsRangeFilter', point_cloud_range=point_cloud_range),
+    dict(type='ObjectRangeFilter', point_cloud_range=point_cloud_range),
+    dict(type='ObjectNameFilter', classes=class_names),
+    dict(type='PointShuffle'),
+    dict(type='DefaultFormatBundle3D', class_names=class_names),
+    dict(type='Collect3D', keys=['points', 'gt_bboxes_3d', 'gt_labels_3d'])
 ]
 test_pipeline = [
     dict(
-        type='LoadPointsFromFileVID',
+        type='LoadPointsFromFile',
         coord_type='LIDAR',
         load_dim=5,
         use_dim=[0, 1, 2, 3, 4],
     ),
     dict(
-        type='LoadPointsFromMultiSweepsVID',
+        type='LoadPointsFromMultiSweeps',
         sweeps_num=10,
         use_dim=[0, 1, 2, 3, 4],
     ),
-    dict(type='LoadMultiViewImageFromFilesVID'),
+    dict(type='LoadMultiViewImageFromFiles'),
     dict(
         type='MultiScaleFlipAug3D',
-        img_scale=img_scale,
+        img_scale=(1333, 800),
         pts_scale_ratio=1,
         flip=False,
         transforms=[
             dict(
-                type='GlobalRotScaleTransVID',
+                type='GlobalRotScaleTrans',
                 rot_range=[0, 0],
                 scale_ratio_range=[1.0, 1.0],
                 translation_std=[0, 0, 0]),
-            dict(type='RandomFlip3DVID'),
-            dict(type='MyResizeVID', img_scale=img_scale, keep_ratio=True),
-            dict(type='MyNormalizeVID', **img_norm_cfg),
-            dict(type='MyPadVID', size_divisor=32),
+            dict(type='RandomFlip3D'),
             dict(
-                type='DefaultFormatBundle3DVID',
+                type='DefaultFormatBundle3D',
                 class_names=class_names,
                 with_label=False),
-            dict(type='Collect3DVID', keys=['points', 'img'])
+            dict(type='Collect3D', keys=['points'])
         ])
 ]
 data = dict(
-
-    samples_per_gpu=2,
-    workers_per_gpu=6,
+    samples_per_gpu=16,
+    workers_per_gpu=32,
     train=dict(
         type='CBGSDataset',
         dataset=dict(
             type=dataset_type,
             data_root=data_root,
             num_views=num_views,
-            ann_file=data_root + '/nuscenes_seq_2_infos_1_7_train.pkl',
+            ann_file=data_root + '/nuscenes_infos_train.pkl',
             load_interval=1,
             pipeline=train_pipeline,
             classes=class_names,
@@ -147,13 +135,12 @@ data = dict(
             test_mode=False,
             box_type_3d='LiDAR',
             with_info=with_info,
-            temporal_mode = True,
             )),
     val=dict(
         type=dataset_type,
         data_root=data_root,
         num_views=num_views,
-        ann_file=data_root + '/nuscenes_seq_2_infos_val.pkl',
+        ann_file=data_root + '/nuscenes_infos_val.pkl',
         load_interval=1,
         pipeline=test_pipeline,
         classes=class_names,
@@ -161,13 +148,12 @@ data = dict(
         test_mode=True,
         box_type_3d='LiDAR',
         with_info=with_info,
-        temporal_mode = True,
         ),
     test=dict(
         type=dataset_type,
         data_root=data_root,
         num_views=num_views,
-        ann_file=data_root + '/nuscenes_seq_2_infos_val.pkl',
+        ann_file=data_root + '/nuscenes_infos_val.pkl',
         load_interval=1,
         pipeline=test_pipeline,
         classes=class_names,
@@ -175,25 +161,9 @@ data = dict(
         test_mode=True,
         box_type_3d='LiDAR',
         with_info=with_info,
-        temporal_mode = True,
         ))
 model = dict(
-    type='TransfusionDetectorSTF',
-    freeze_img=True,
-    img_backbone=dict(
-        type='ResNet',
-        depth=50,
-        num_stages=4,
-        out_indices=(0, 1, 2, 3),
-        frozen_stages=1,
-        norm_cfg=dict(type='BN', requires_grad=True),
-        norm_eval=True,
-        style='pytorch'),
-    img_neck=dict(
-        type='FPN',
-        in_channels=[256, 512, 1024, 2048],
-        out_channels=256,
-        num_outs=5),
+    type='TransFusionDetector',
     pts_voxel_layer=dict(
         max_num_points=10,
         voxel_size=voxel_size,
@@ -204,48 +174,14 @@ model = dict(
         num_features=5,
     ),
     pts_middle_encoder=dict(
-        type='SparseEncoderTempFusion',
+        type='SparseEncoder',
         in_channels=5,
         sparse_shape=[41, 1440, 1440],
         output_channels=128,
         order=('conv', 'norm', 'act'),
         encoder_channels=((16, 16, 32), (32, 32, 64), (64, 64, 128), (128, 128)),
         encoder_paddings=((0, 0, 1), (0, 0, 1), (0, 0, [0, 1, 1]), (0, 0)),
-        block_type='basicblock',
-        # DDA
-        fusion_pos=[3],
-        voxel_size=voxel_size,
-        point_cloud_range=point_cloud_range,
-        fusion_layer=dict(
-            type='STF_v1',
-            transformer='STFTR',
-            sparse_shape=[41, 1440, 1440],
-            point_cloud_range=point_cloud_range,
-            voxel_size=voxel_size,
-            query_init_cfg=dict(
-                in_channels=128,
-                norm_cfg=dict(type='BN1d', requires_grad=True),
-                voxel_stride=8,
-                top_k=True,
-                point_cloud_range=point_cloud_range,
-                voxel_size=voxel_size,
-                threshold=0.5,
-                loss_focal=dict(type='FocalLoss', use_sigmoid=True, gamma=2, alpha=0.25, 
-                                reduction='mean', loss_weight=1.0),
-                update_query=False
-            ),
-            stf_cfg=dict(
-                knn_samples_num=9,
-                img_samples_num=9,
-                num_layers=2,
-                v_num_channels=128,
-                dropout=0.1,
-                seq_len=seq_len,
-                img_attn_cfg=dict(
-                    img_channels=256,
-                    hidden_channels=128,
-                    dropout_i=0.1)))
-        ),
+        block_type='basicblock'),
     pts_backbone=dict(
         type='SECOND',
         in_channels=256,
@@ -263,7 +199,7 @@ model = dict(
         upsample_cfg=dict(type='deconv', bias=False),
         use_conv_for_no_stride=True),
     pts_bbox_head=dict(
-        type='GatedTransFusionHead',
+        type='TransFusionHead',
         num_proposals=200,
         auxiliary=True,
         in_channels=256 * 2,
@@ -292,9 +228,6 @@ model = dict(
         # loss_iou=dict(type='CrossEntropyLoss', use_sigmoid=True, reduction='mean', loss_weight=0.0),
         loss_bbox=dict(type='L1Loss', reduction='mean', loss_weight=0.25),
         loss_heatmap=dict(type='GaussianFocalLoss', reduction='mean', loss_weight=1.0),
-        # gated network_cfg
-        gated_in_channels=[512],
-        gated_seq_len=seq_len,
     ),
     train_cfg=dict(
         pts=dict(
@@ -323,8 +256,8 @@ model = dict(
             voxel_size=voxel_size[:2],
             nms_type=None,
         )))
-optimizer = dict(type='AdamW', lr=0.0001, weight_decay=0.01)  # for 8gpu * 2sample_per_gpu
-optimizer_config = dict(grad_clip=dict(max_norm=0.1, norm_type=2))
+optimizer = dict(type='AdamW', lr=0.0002, weight_decay=0.01)  
+optimizer_config = None
 lr_config = dict(
     policy='cyclic',
     target_ratio=(10, 0.0001),
@@ -335,7 +268,7 @@ momentum_config = dict(
     target_ratio=(0.8947368421052632, 1),
     cyclic_times=1,
     step_ratio_up=0.4)
-total_epochs = 40
+total_epochs = 20
 checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=50,
@@ -344,8 +277,8 @@ log_config = dict(
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = None
-load_from = './model_zoo/mask_rcnn_r50_fpn_1x_nuim_20201008_195238-e99f5182_img_backbone.pth'
+load_from = None
 resume_from = None
 workflow = [('train', 1)]
 gpu_ids = range(0, 8)
-find_unused_parameters = True
+fp16 = dict(loss_scale=256.)
