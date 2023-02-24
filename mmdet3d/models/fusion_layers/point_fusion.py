@@ -450,6 +450,7 @@ class ACTR(nn.Module):
             st += num_points[b]
         pts_feats_n, img_feats_n, coor_2d_n, coor_2d_n_o, pts_n, num_points_n, pts_mask_n = self.split_param(
             pts_feats_b, coor_2d_b, coor_2d_b_o, img_feats, pts_b, num_points, img_meta)
+        breakpoint()
         if False:
             import cv2
             for b in range(batch_size):

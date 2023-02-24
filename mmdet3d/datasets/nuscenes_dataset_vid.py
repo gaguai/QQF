@@ -224,7 +224,11 @@ class NuScenesDatasetVID(Custom3DDataset):
             timestamp=[],
             img_filename=[],
             lidar2img=[],
+            ego_rot=[],
+            ego_trans=[],
         )
+
+        l2e_r, l2e_t, e2g_r, e2g_t = [], [], [], []
 
         for info in infos:
             input_dict['sample_idx'].append(info['token'])
@@ -232,6 +236,11 @@ class NuScenesDatasetVID(Custom3DDataset):
             input_dict['pts_filename'].append(info['lidar_path'])
             input_dict['sweeps'].append(info['sweeps'])
             input_dict['timestamp'].append(info['timestamp'] / 1e6)
+
+            l2e_r.append(pyquaternion.Quaternion(info['lidar2ego_rotation']).rotation_matrix)
+            l2e_t.append(np.array(info['lidar2ego_translation']))
+            e2g_r.append(pyquaternion.Quaternion(info['ego2global_rotation']).rotation_matrix)
+            e2g_t.append(np.array(info['ego2global_translation']))
 
             cam_orders = ['CAM_FRONT_LEFT', 'CAM_FRONT', 'CAM_FRONT_RIGHT', 'CAM_BACK_RIGHT', 'CAM_BACK', 'CAM_BACK_LEFT']
             if self.modality['use_camera']:
@@ -258,6 +267,17 @@ class NuScenesDatasetVID(Custom3DDataset):
                 input_dict['img_filename'].append(image_paths)
                 input_dict['lidar2img'].append(lidar2img_rts)
                 
+        for i in range(len(infos)):
+            rot = (l2e_r[i].T @ e2g_r[i].T) @ (
+                    np.linalg.inv(e2g_r[0]).T @ np.linalg.inv(l2e_r[0]).T)
+            trans = (l2e_t[i] @ e2g_r[i].T + e2g_t[i]) @ (
+                    np.linalg.inv(e2g_r[0]).T @ np.linalg.inv(l2e_r[0]).T)
+            trans -= e2g_t[0] @ (np.linalg.inv(e2g_r[0]).T @ np.linalg.inv(l2e_r[0]).T
+                    ) + (l2e_t[0] @ np.linalg.inv(l2e_r[0]).T)
+            rot = rot.T
+
+            input_dict['ego_rot'].append(rot)
+            input_dict['ego_trans'].append(trans)
 
         if not self.test_mode:
             annos = self.get_ann_info(index)

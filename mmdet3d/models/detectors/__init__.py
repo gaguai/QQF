@@ -11,6 +11,7 @@ from .votenet import VoteNet
 from .voxelnet import VoxelNet
 from .transfusion import TransFusionDetector
 from .temptransfusion import TemporalTransFusionDetector
+from.transfusion_stf import TransfusionDetectorSTF
 
 __all__ = [
     'Base3DDetector',
@@ -27,4 +28,5 @@ __all__ = [
     'ImVoteNet',
     'TransFusionDetector',
     'TemporalTransFusionDetector',
+    'TransfusionDetectorSTF',
 ]
