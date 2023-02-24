@@ -130,7 +130,8 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
+
+    samples_per_gpu=2,
     workers_per_gpu=6,
     train=dict(
         type='CBGSDataset',
@@ -217,7 +218,7 @@ model = dict(
         point_cloud_range=point_cloud_range,
         fusion_layer=dict(
             type='STF_v1',
-            transformer='TempACTR',
+            transformer='STFTR',
             sparse_shape=[41, 1440, 1440],
             point_cloud_range=point_cloud_range,
             voxel_size=voxel_size,
@@ -233,36 +234,17 @@ model = dict(
                                 reduction='mean', loss_weight=1.0),
                 update_query=False
             ),
-            img_query_init_cfg=dict(
-                num_channels=[256],
-                sparse_shape=[41, 1440, 1440],
-                point_cloud_range=point_cloud_range,
-                voxel_size=voxel_size,
-                max_num_ne_voxel=26000,
-                coord_type='LIDAR'
-            ),
-            pfat_cfg=dict(
-                fusion_method='sum',
-                feature_modal='hybrid',
-                hybrid_cfg=dict(
-                    attn_layer='BiGateSum1D_2',
-                    q_method='sum',
-                    q_rep_place=['weight']
-                ),
-                num_bins=80,
-                num_channels=[256],
-                query_num_feat=128,
-                num_enc_layers=2,
-                max_num_ne_voxel=26000,
-                pos_encode_method='depth'),
-            lt_cfg=dict(
-                npoint=2048,
-                radius=2.0,
-                nsample=32,
+            stf_cfg=dict(
+                knn_samples_num=9,
+                img_samples_num=9,
                 num_layers=2,
-                attn_feat_agg_method='unique',
-                feat_agg_method='replace'
-            ))
+                v_num_channels=128,
+                dropout=0.1,
+                seq_len=seq_len,
+                img_attn_cfg=dict(
+                    img_channels=256,
+                    hidden_channels=128,
+                    dropout_i=0.1)))
         ),
     pts_backbone=dict(
         type='SECOND',

@@ -5,7 +5,6 @@ class_names = [
 ]
 voxel_size = [0.075, 0.075, 0.2]
 out_size_factor = 8
-out_voxel_size = [voxel_size[0]*out_size_factor, voxel_size[1]*out_size_factor, voxel_size[2]*out_size_factor]
 evaluation = dict(interval=1)
 dataset_type = 'NuScenesDatasetVID'
 data_root = 'data/nuscenes/'
@@ -242,14 +241,6 @@ model = dict(
                 max_num_ne_voxel=26000,
                 coord_type='LIDAR'
             ),
-            ########################################
-            img_cross_attn_cfg=dict(
-                pts_channels=128,
-                img_channels=256,
-                hidden_channels=128,
-                dropout=0.1
-            ),
-            ########################################
             pfat_cfg=dict(
                 fusion_method='sum',
                 feature_modal='hybrid',
